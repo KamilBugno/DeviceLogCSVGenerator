@@ -7,12 +7,11 @@ using System.Threading.Tasks;
 
 namespace Generator
 {
-    class MainProgram
+    class FileWriter
     {
-        static void Main(string[] args)
+        public void WriteToFile(string text)
         {
-            Generator generator = new Generator();
-            generator.Generate();
+            File.AppendAllText(ConstantData.fileName, text);
         }
     }
 }
