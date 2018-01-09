@@ -23,7 +23,8 @@ namespace Generator
             for (var numberOfRow = 0; numberOfRow < ConstantData.numberOfRows; numberOfRow++, ConstantData.key++)
             {
                 var type = GenerateType();
-                SaveRow(GenerateDate(), type, GenerateSource(), GenerateInformation(type));
+                var source = GenerateSource(type);
+                SaveRow(GenerateDate(), type, source, GenerateInformation(source));
             }
         }
 
@@ -60,14 +61,35 @@ namespace Generator
             return ConstantData.type[typeId];
         }
 
-        public string GenerateSource()
+        public string GenerateSource(string type)
         {
-            return "source";
+            if(type == "debug")
+            {
+                return ConstantData.informationSource[0];
+            } else
+            {
+                return ConstantData.informationSource[1];
+            }
         }
 
-        public string GenerateInformation(string type)
+        public string GenerateInformation(string source)
         {
-            return "information";
+            if (source == "OS")
+            {
+                return ChooseRandomlyFromList(ConstantData.informationFromOS);
+            }
+            else if (source == "Battery Monitor")
+            {
+                return ChooseRandomlyFromList(ConstantData.informationFromBatteryMonitor);
+            }
+            return String.Empty;
+        }
+
+        private string ChooseRandomlyFromList(string[] list)
+        { 
+            var maxValue = list.Length;
+            var randomNumber = random.Next(0, maxValue);
+            return list[randomNumber];
         }
 
 
