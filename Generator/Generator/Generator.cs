@@ -19,7 +19,7 @@ namespace Generator
 
         public void Generate()
         {
-            SaveFirstRow();
+            fileWriter.SaveFirstRow();
             var dateList = GenerateSortedListOfDates();
             for (var numberOfRow = 0; numberOfRow < ConstantData.numberOfRows; numberOfRow++, ConstantData.key++)
             {
@@ -31,25 +31,8 @@ namespace Generator
                 var status = complexInformation.status;
                 var connection = complexInformation.connection;
                 var TCP4 = complexInformation.TCP4;
-                SaveRow(date, type, source, information, status, connection, TCP4);
+                fileWriter.SaveRow(date, type, source, information, status, connection, TCP4);
             }
-        }
-
-        public void SaveRow(string date, string type, string source, string information, 
-            string status, string connection, string TCP4)
-        {
-            var row = $"{ConstantData.key},{ConstantData.deviceSN},";
-            row += $"{date},{type},{source},{information},";
-            row += $"{status},{connection},{TCP4}";
-            row += Environment.NewLine;
-            fileWriter.WriteToFile(row);
-           
-        }
-
-        public void SaveFirstRow()
-        {
-            var firstRow = ConstantData.firstRow + Environment.NewLine;
-            fileWriter.WriteToFile(firstRow);
         }
 
         public List<DateTime> GenerateSortedListOfDates()
