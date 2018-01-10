@@ -26,17 +26,24 @@ namespace Generator
                 var date = DateToString(dateList[numberOfRow]);
                 var type = GenerateType();
                 var source = GenerateSource(type);
-                var information = GenerateInformation(source);
-                SaveRow(date, type, source, information);
+                var information = GenerateBasicInformation(source);
+                var complexInformation = GenerateComplexInformation(source);
+                var status = complexInformation.status;
+                var connection = complexInformation.connection;
+                var TCP4 = complexInformation.TCP4;
+                SaveRow(date, type, source, information, status, connection, TCP4);
             }
         }
 
-        public void SaveRow(string date, string type, string source, string information)
+        public void SaveRow(string date, string type, string source, string information, 
+            string status, string connection, string TCP4)
         {
             var row = $"{ConstantData.key},{ConstantData.deviceSN},";
-            row += $"{date},{type},{source},{information}";
+            row += $"{date},{type},{source},{information},";
+            row += $"{status},{connection},{TCP4}";
             row += Environment.NewLine;
             fileWriter.WriteToFile(row);
+           
         }
 
         public void SaveFirstRow()
@@ -58,7 +65,6 @@ namespace Generator
 
         public DateTime GenerateDate()
         {
-            //np. 2017-12-28T14:43:04.201
             var year = ConstantData.year;
             var month = ConstantData.month;
             var day = random.Next(1, DateTime.DaysInMonth(year, month) + 1);
@@ -83,17 +89,33 @@ namespace Generator
 
         public string GenerateSource(string type)
         {
-            return ChooseRandomlyFromList(ConstantData.informationSourceOnType[type]);
+            return ChooseRandomlyFromBasicList(ConstantData.informationSourceOnType[type]);
         }
 
-        public string GenerateInformation(string source)
+        public string GenerateBasicInformation(string source)
         {
-            return ChooseRandomlyFromList(ConstantData.informationOnInformationSource[source]);
+            if(ConstantData.basicInformationOnInformationSource.Keys.Contains(source))
+                return ChooseRandomlyFromBasicList(ConstantData.basicInformationOnInformationSource[source]);
+            return string.Empty;
         }
 
-        private string ChooseRandomlyFromList(string[] list)
+        public (string status, string connection, string TCP4) GenerateComplexInformation(string source)
+        {
+            if (ConstantData.complexInformationOnInformationSource.Keys.Contains(source))
+                return ChooseRandomlyFromComplexList(ConstantData.complexInformationOnInformationSource[source]);
+            return (string.Empty, string.Empty, string.Empty);
+        }
+
+        private string ChooseRandomlyFromBasicList(string[] list)
         { 
             var maxValue = list.Length;
+            var randomNumber = random.Next(0, maxValue);
+            return list[randomNumber];
+        }
+
+        private (string, string, string) ChooseRandomlyFromComplexList(List<(string, string, string)> list)
+        {
+            var maxValue = list.Count;
             var randomNumber = random.Next(0, maxValue);
             return list[randomNumber];
         }
