@@ -20,11 +20,14 @@ namespace Generator
         public void Generate()
         {
             SaveFirstRow();
+            var dateList = GenerateSortedListOfDates();
             for (var numberOfRow = 0; numberOfRow < ConstantData.numberOfRows; numberOfRow++, ConstantData.key++)
             {
+                var date = DateToString(dateList[numberOfRow]);
                 var type = GenerateType();
                 var source = GenerateSource(type);
-                SaveRow(GenerateDate(), type, source, GenerateInformation(source));
+                var information = GenerateInformation(source);
+                SaveRow(date, type, source, information);
             }
         }
 
@@ -38,21 +41,38 @@ namespace Generator
 
         public void SaveFirstRow()
         {
-            var firstRow = "_key,device_SN,date,type,source,information" + Environment.NewLine;
+            var firstRow = ConstantData.firstRow + Environment.NewLine;
             fileWriter.WriteToFile(firstRow);
         }
 
-        public string GenerateDate()
+        public List<DateTime> GenerateSortedListOfDates()
+        {
+            List<DateTime> dateList = new List<DateTime>();
+            for(var numberOfDates = 0; numberOfDates < ConstantData.numberOfRows; numberOfDates++)
+            {
+                dateList.Add(GenerateDate());
+            }
+            dateList.Sort();
+            return dateList;
+        }
+
+        public DateTime GenerateDate()
         {
             //np. 2017-12-28T14:43:04.201
-            var now = DateTime.Now;
-            var day = random.Next(1, 29);
-            var hour = random.Next(0, 25);
+            var year = ConstantData.year;
+            var month = ConstantData.month;
+            var day = random.Next(1, DateTime.DaysInMonth(year, month) + 1);
+            var hour = random.Next(0, 24);
             var minute = random.Next(0, 60);
             var second = random.Next(0, 60);
-            var thousandth = random.Next(0, 1000);
-            var date = new DateTime(now.Year, now.Month, day, hour, minute, second);
-            return date.ToString("yyyy-MM-ddTHH:mm:ss.") + thousandth;
+            var date = new DateTime(year, month, day, hour, minute, second);
+            return date;
+            
+        }
+
+        public string DateToString(DateTime date)
+        {
+            return date.ToString("yyyy-MM-ddTHH:mm:ss.000");
         }
 
         public string GenerateType()
@@ -63,26 +83,12 @@ namespace Generator
 
         public string GenerateSource(string type)
         {
-            if(type == "debug")
-            {
-                return ConstantData.informationSource[0];
-            } else
-            {
-                return ConstantData.informationSource[1];
-            }
+            return ChooseRandomlyFromList(ConstantData.informationSourceOnType[type]);
         }
 
         public string GenerateInformation(string source)
         {
-            if (source == "OS")
-            {
-                return ChooseRandomlyFromList(ConstantData.informationFromOS);
-            }
-            else if (source == "Battery Monitor")
-            {
-                return ChooseRandomlyFromList(ConstantData.informationFromBatteryMonitor);
-            }
-            return String.Empty;
+            return ChooseRandomlyFromList(ConstantData.informationOnInformationSource[source]);
         }
 
         private string ChooseRandomlyFromList(string[] list)
