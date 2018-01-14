@@ -8,8 +8,8 @@ namespace Generator
 {
     class ConstantData
     {
-        public static string fileName = "./plik654321.txt";
-        public static int numberOfRows = 10;
+        public static string fileName = "./100-logs-csv.csv";
+        public static int numberOfRows = 100;
         public static int year = 2018;
         public static int month = 1;
         public static int key = 1;
